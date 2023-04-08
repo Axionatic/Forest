@@ -4,7 +4,9 @@
 
 /** Settings for the ground */
 export const GROUND = {
-  'COLOUR': [96, 96, 96, 96],
+  /** Ground stroke weight */
+  'STROKE_WEIGHT': 3,
+  'COLOUR': [48, 48, 48, 255],
   /** The Y position that will be used as a baseline for the ground, as a percentage of canvas height */
   'BASELINE': 0.75,
   /** The Y value that noise results will be multiplied by, as a percentage of canvas height */
@@ -15,27 +17,65 @@ export const GROUND = {
 
 /** Settings for seeds */
 export const SEED = {
-  /** @type {number} Seed size */
+  /** Seed size */
   'RADIUS': 6,
-  /** @type {number} Seed minimum resting time */
-  'MIN_REST': 1500,
-  /** @type {number} Seed maximum resting time */
-  'MAX_REST': 3500,
-  /** @type {number} Seed minimum digging time */
+  /** Min seed resting time */
+  'MIN_REST': 1000,
+  /** Max seed resting time */
+  'MAX_REST': 2250,
+  /** Min seed digging time */
   'MIN_DIG_TIME': 3000,
-  /** @type {number} Seed maximum digging time */
+  /** Max seed digging time */
   'MAX_DIG_TIME': 5000,
-  /** @type {number} Min depth that seed digs to */
+  /** Min depth that seed digs to */
   'MIN_DEPTH': 40,
-  /** @type {number} Max depth that seed digs to */
+  /** Max depth that seed digs to */
   'MAX_DEPTH': 80,
-  /** @type {number} Rate at which seed falls */
+  /** Rate at which seed falls */
   'GRAVITY': 0.025,
-  /** @type {number} Power to use for ease-out function controlling seed digging behaviour */
+  /** Power to use for ease-out function controlling seed dig animation */
   'DIG_EASE_POW': 3,
-  /** @type {number} Rate at which seed decays once it has germinated */
+  /** Rate at which seed decays once it has germinated */
   'DECAY': 1,
 };
+
+/** Settings for trees/branches */
+export const BRANCH = {
+  /** Tree stroke weight */
+  'STROKE_WEIGHT': 3,
+  /** Min branch length */
+  'MIN_LEN': 30,
+  /** Max branch length */
+  'MAX_LEN': 60,
+  /** Length multiplier for child branches */
+  'CHILD_LEN_MULT': 0.75,
+  /** Min branch growing time */
+  'MIN_GROW_TIME': 3500,
+  /** Max branch growing time */
+  'MAX_GROW_TIME': 7000,
+  /** Power to use for ease-out function controlling branch grow animation */
+  'GROW_EASE_POW': 2,
+  /** Min number of times a tree can fork */
+  'MIN_DEPTH': 2,
+  /** Max number of times a tree can fork */
+  'MAX_DEPTH': 4,
+  /** Percent chance for a branch to grow new branches */
+  'FORK_CHANCE': 0.8,
+  /** How widely child branches spread, in radians */
+  'FORK_ANGLE': 2 * Math.PI / 3, // 120 degrees
+  /** Min number of branches a tree limb forks into */
+  'MIN_CHILDREN': 2,
+  /** Max number of branches a tree limb forks into */
+  'MAX_CHILDREN': 5,
+  /** Min percent of growth animation at which branch may fork */
+  'MIN_FORK_POINT': 0.45,
+  /** Max percent of growth animation at which branch may fork */
+  'MAX_FORK_POINT': 0.8,
+  /** Min time for (fully grown) branch to fade between colours */
+  'MIN_FADE_TIME': 750,
+  /** Min time for (fully grown) branch to fade between colours */
+  'MAX_FADE_TIME': 1500,
+}
 
 /** Palettes of colours for trees. 10 palettes of 5 colours each. */
 export const TREE_COLS = [
