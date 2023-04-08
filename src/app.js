@@ -8,19 +8,23 @@ import p8g, {
   mouseX,
   mouseY,
   noStroke,
+  random,
   stroke,
   strokeWeight,
   width,
 } from 'p8g.js';
 import { createNoise2D } from 'simplex-noise';
 
-import { GROUND } from './settings';
+import { BRANCH, GROUND, LEAF_COLS, TREE_COLS } from './settings';
 import Seed from './seed';
+import Branch from './branch';
 
-/** @type {Array<number>} The Y value of the ground for each X value. Is it just me or is this horrible? */
+/** @type {Array<number>} The Y value of the ground for each X value */
 const groundY = [];
 /** @type {Array<Seed>} */
 let seeds = [];
+/** @type {Array<Branch>} */
+const trees = [];
 
 // main loop
 p8g.draw = () => {
@@ -28,16 +32,29 @@ p8g.draw = () => {
 
   // ground. Ugh, there must be a better way to do this...
   stroke(GROUND.COLOUR);
-  strokeWeight(1);
+  strokeWeight(GROUND.STROKE_WEIGHT);
   groundY.forEach((y, x) => line(x, y, x, height));
 
   // seeds
   noStroke();
   seeds.forEach(s => s.run());
-  seeds = seeds.filter(s => s.isDead()); // lazy. Would splice be better?
+  seeds = seeds.filter(s => s.isAlive()); // lazy. Splice instead?
 
   // trees
-  // ...
+  strokeWeight(BRANCH.STROKE_WEIGHT);
+  if (!trees.length) {
+    for (let i = 0; i < 100; i++) {
+      trees.push(new Branch(
+        random(width),
+        random(height),
+        0,
+        0,
+        TREE_COLS[Math.floor(random(TREE_COLS.length))],
+        LEAF_COLS[Math.floor(random(LEAF_COLS.length))],
+      ));
+    }
+  }
+  trees.forEach(t => t.run());
 
   // leaves
   // ...
@@ -45,14 +62,12 @@ p8g.draw = () => {
 
 // listen for clicks
 p8g.mouseReleased = () => {
+  // sow a seed if the mouse was clicked above ground
   const x = Math.round(mouseX);
   const y = Math.round(mouseY);
-  // sow a seed if the mouse was clicked above ground
-  if (y >= groundY[x]) {
-    return;
+  if (y < groundY[x]) {
+    seeds.push(new Seed(x, y, groundY[x]));
   }
-  seeds.push(new Seed(x, y, groundY[x]));
-  console.log(x, y, groundY[x]);
 }
 
 /** Prepare sketch and create canvas */
