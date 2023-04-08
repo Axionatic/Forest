@@ -6,6 +6,7 @@ import {
   random
 } from "p8g.js";
 import { SEED } from "./settings";
+import { animPercent, easeOut } from "./utils";
 
 const SEED_STATES = {
   'falling': 0,
@@ -16,7 +17,28 @@ const SEED_STATES = {
 
 export default class Seed {
   /** @type {number} */
+  x;
+  /** @type {number} */
+  y;
+  /** @type {number} */
+  groundY;
+  /** @type {number} */
+  dY;
+  /** @type {number} */
+  restTime;
+  /** @type {number} */
+  digTime;
+  /** @type {number} */
+  digYOff;
+  /** @type {Array<number>} */
+  colour;
+  /** @type {number} */
+  restInit;
+  /** @type {number} */
+  digInit;
+  /** @type {number} */
   #state;
+
   /**
    * @param {number} x Initial X position
    * @param {number} yFrom Initial Y position
@@ -30,8 +52,8 @@ export default class Seed {
     this.dY = 0;
 
     // randomise behaviour
-    this.restMS = random(SEED.MIN_REST, SEED.MAX_REST);
-    this.digMS = random(SEED.MIN_DIG_TIME, SEED.MAX_DIG_TIME);
+    this.restTime = random(SEED.MIN_REST, SEED.MAX_REST);
+    this.digTime = random(SEED.MIN_DIG_TIME, SEED.MAX_DIG_TIME);
     // don't dig to OOB
     this.digYOff = Math.min(
       random(SEED.MIN_DEPTH, SEED.MAX_DEPTH),
@@ -86,15 +108,15 @@ export default class Seed {
   /** Seed rests for a while before digging */
   #updateResting() {
     // check if rest is finished
-    if (millis() >= this.restInit + this.restMS) {
+    if (millis() >= this.restInit + this.restTime) {
       this.digInit = millis();
       this.#state = SEED_STATES.digging;
     }
   }
 
-  /** Seed digs into the soil */
+  /** Seed digs into the soil and germinates */
   #updateDigging() {
-    const animPerc = (millis() - this.digInit) / this.digMS;
+    const animPerc = animPercent(this.digInit, this.digTime);
     // check if digging is finished
     if (animPerc >= 1) {
       this.#state = SEED_STATES.growing;
@@ -102,11 +124,10 @@ export default class Seed {
     }
 
     // set Y pos according to ease-out funciton based on animation percentage
-    this.y = this.groundY + this.digYOff * this.#digEase(animPerc);
-
+    this.y = this.groundY + this.digYOff * easeOut(animPerc, SEED.DIG_EASE_POW);
   }
 
-  /** Seed germinates and fades away */
+  /** Seed fades away */
   #updateGrowing() {
     this.colour[3] = Math.max(this.colour[3] - SEED.DECAY, 0);
   }
@@ -117,16 +138,7 @@ export default class Seed {
     ellipse(this.x, this.y, SEED.RADIUS, SEED.RADIUS);
   }
 
-  isDead() {
-    return this.colour[3] === 0;
-  }
-
-  /**
-   * Easing for seed dig animation
-   * @param {number} x 
-   * @returns {number}
-   */
-  #digEase(x) {
-    return 1 - Math.pow(1 - x, SEED.DIG_EASE_POW);
+  isAlive() {
+    return !!this.colour[3];
   }
 }
